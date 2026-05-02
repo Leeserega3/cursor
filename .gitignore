@@ -1,0 +1,19 @@
+## 1C base/cache
+*.1CD
+*.1CL
+*.cdn
+*.lck
+*.pfl
+1Cv8Log/
+1Cv8Tmp/
+ConfigDumpInfo.xml.bak
+
+## EDT / IDE
+.metadata/
+.settings/
+.recommenders/
+*.swp
+
+## OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,15 @@
+* text=auto eol=lf
+
+*.bsl   text eol=lf diff
+*.os    text eol=lf diff
+*.xml   text eol=lf diff
+*.mdo   text eol=lf diff
+*.form  text eol=lf diff
+
+*.epf   binary
+*.erf   binary
+*.cf    binary
+*.cfe   binary
+*.dt    binary
+*.mxl   binary
+*.1CD   binary
