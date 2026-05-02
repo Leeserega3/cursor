@@ -1,0 +1,58 @@
+name: BSL Language Server
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "1c-config/**"
+      - ".bsl-language-server.json"
+      - "scripts/bsl-ls.sh"
+      - ".github/workflows/bsl-ls.yml"
+  pull_request:
+    paths:
+      - "1c-config/**"
+      - ".bsl-language-server.json"
+      - "scripts/bsl-ls.sh"
+      - ".github/workflows/bsl-ls.yml"
+  workflow_dispatch:
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Cache BSL LS jar
+        uses: actions/cache@v4
+        with:
+          path: .bsl-ls
+          key: bsl-ls-${{ hashFiles('scripts/bsl-ls.sh') }}
+
+      - name: Run BSL LS analyze (sarif + json)
+        run: scripts/bsl-ls.sh --reporter sarif --reporter json
+
+      - name: Upload SARIF report
+        if: always() && hashFiles('reports/bsl-ls.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: reports/bsl-ls.sarif
+          category: bsl-language-server
+
+      - name: Upload JSON report as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsl-ls-report
+          path: |
+            reports/bsl-json.json
+            reports/bsl-ls.sarif
+          if-no-files-found: ignore

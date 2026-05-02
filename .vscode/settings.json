@@ -1,0 +1,12 @@
+{
+  "bsl.languageServerReportsPath": "reports",
+  "bsl.diagnosticLanguage": "ru",
+  "files.associations": {
+    "*.bsl": "bsl",
+    "*.os": "bsl"
+  },
+  "[bsl]": {
+    "editor.insertSpaces": false,
+    "editor.tabSize": 4
+  }
+}

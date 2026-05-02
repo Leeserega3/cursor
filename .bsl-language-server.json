@@ -1,0 +1,22 @@
+{
+  "$schema": "https://1c-syntax.github.io/bsl-language-server/dev/configuration-schema.json",
+  "language": "ru",
+  "siteRoot": "",
+  "showCognitiveComplexityCodeLens": true,
+  "showCyclomaticComplexityCodeLens": true,
+  "computeDiagnosticsTrigger": "onSave",
+  "computeTrigger": "onSave",
+  "traceLog": "",
+  "configurationRoot": "1c-config/src",
+  "diagnosticLanguage": "ru",
+  "codeLensOptions": {
+    "showCognitiveComplexity": true,
+    "showCyclomaticComplexity": true
+  },
+  "diagnostics": {
+    "Typo": false,
+    "LineLength": {
+      "maxLineLength": 140
+    }
+  }
+}

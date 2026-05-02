@@ -17,3 +17,8 @@ ConfigDumpInfo.xml.bak
 ## OS
 .DS_Store
 Thumbs.db
+
+## BSL Language Server cache and reports
+.bsl-ls/
+reports/
+

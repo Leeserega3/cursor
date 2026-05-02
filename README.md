@@ -96,7 +96,64 @@ Cloud-агент работает на удалённой VM — у него у�
 > Если их нет — попросите выполнить онбординг окружения на
 > [cursor.com/onboard](https://cursor.com/onboard).
 
-## 4. Опциональные MCP-серверы под 1С
+## 4. BSL Language Server (проверка синтаксиса 1С)
+
+[BSL Language Server](https://github.com/1c-syntax/bsl-language-server) — это
+**LSP-сервер** (не MCP). Он подключается двумя способами:
+
+### 4.1. В Cursor Desktop — подсветка ошибок прямо в редакторе
+
+1. Установить расширение **«Language 1C (BSL)»** (`1c-syntax.language-1c-bsl`).
+   Оно уже добавлено в `.vscode/extensions.json` как рекомендуемое — Cursor
+   предложит его установить при открытии проекта.
+2. Установить JDK 17+ (для BSL LS 0.29.x — JDK 21).
+3. Открыть файл `*.bsl` из `1c-config/src/` — расширение само поднимет
+   BSL LS, и в левом колодце редактора появятся диагностики.
+4. Настройки в `.vscode/settings.json` уже включают русский язык диагностик и
+   корректные ассоциации файлов.
+
+После этого агент Cursor (Cmd/Ctrl+I) тоже видит ошибки и предупреждения и
+может их исправлять.
+
+### 4.2. В CI и в Cloud Agent — анализ всей конфигурации одной командой
+
+В репозитории есть скрипт-обёртка `scripts/bsl-ls.sh`, который:
+
+- скачивает нужную версию BSL LS (`bsl-language-server-<ver>-exec.jar`) в
+  локальный кеш `.bsl-ls/`;
+- запускает её в режиме `analyze` поверх `1c-config/src/` с конфигурацией
+  `.bsl-language-server.json`;
+- складывает отчёты в `reports/`.
+
+Запуск:
+
+```bash
+# консольный отчёт
+scripts/bsl-ls.sh
+
+# JSON-отчёт (reports/bsl-json.json) — удобно читать агенту
+scripts/bsl-ls.sh --reporter json
+
+# SARIF-отчёт (reports/bsl-ls.sarif) — для GitHub code scanning
+scripts/bsl-ls.sh --reporter sarif
+
+# зафиксировать конкретную версию
+BSL_LS_VERSION=0.29.0 scripts/bsl-ls.sh --reporter json
+```
+
+GitHub Actions workflow `.github/workflows/bsl-ls.yml` автоматически прогоняет
+анализ на каждом PR, заливает SARIF в **Security → Code scanning** и кладёт
+JSON отчёт как артефакт сборки.
+
+### 4.3. Как этим пользуется агент
+
+Агент (включая меня в Cloud Agents) перед доработками может вызвать
+`scripts/bsl-ls.sh --reporter json` и прочитать `reports/bsl-json.json`,
+чтобы знать о существующих ошибках/предупреждениях. После своих изменений —
+повторить запуск, убедиться, что новых проблем нет, и только тогда
+коммитить. Это поведение зафиксировано в `.cursor/rules/1c.mdc`.
+
+## 5. Опциональные MCP-серверы под 1С
 
 Существуют community-серверы, которые расширяют возможности (статический
 анализ BSL, прямой запрос к ИБ через HTTP-сервисы и т.п.). Подключаются
@@ -127,7 +184,7 @@ Cloud-агент работает на удалённой VM — у него у�
 данные кладите в **Cursor → Settings → Secrets** (или Cloud Agents → Secrets),
 а не в `mcp.json`.
 
-## 5. Безопасность
+## 6. Безопасность
 
 - Не коммитьте `.1CD`, `.dt`, дампы с реальными ПДн.
 - Не храните пароли в `mcp.json`. Только переменные окружения / секреты Cursor.
